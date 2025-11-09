@@ -1,1 +1,1 @@
-# bootloader-v16
+# Single stage Linux bootloader
