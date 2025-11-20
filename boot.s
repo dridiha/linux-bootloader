@@ -24,7 +24,7 @@ _load_ata_driver:
   int $0x13
   
 _load_boot_sector:
-mov $BASE_SEG, %ax
+  mov $BASE_SEG, %ax
   mov %ax, %es
   mov $0x02, %ah
   mov $1, %al
@@ -50,14 +50,11 @@ _init_kernel_header:
   orb $0x80, %es:0x211
   // heap end_ptr
   movw $0xDE00, %es:0x224
-  // initramfs
-  movw $0x0, %es:0x218
-  mov $0x0, %es:0x21c
   // cmd_line_ptr
   movl $0x1E000, %es:0x228
-  // address of initrd
+  // address of initramfs
   movl $0x3C00000, %es:0x218
-  // size of initrd 
+  // size of initramfs 
   movl $DISK_IMG_SIZE_BYTES, %es:0x21c
 
 _copy_cmd_line:
@@ -93,7 +90,6 @@ _load_compressed_kernel:
   mov %es:0x101F4, %edx
   shr $5, %edx
   push %edx
-  mov %dx, %bx
 
   xor %eax, %eax
   movb %es:0x101F1, %al
