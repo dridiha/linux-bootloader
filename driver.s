@@ -4,17 +4,17 @@ _ata_driver_init:
   push %ebp
   mov %esp, %ebp 
   mov 8(%ebp), %eax 
-  mov %eax, disk_addr
+  mov %eax, load_addr
   mov 12(%ebp), %eax 
-  mov %eax, disk_lba
+  mov %eax, lba
   mov 16(%ebp), %eax 
-  mov %eax, disk_img_size
+  mov %eax, size
   mov 20(%ebp), %eax 
   mov %eax, disk_number
 
 _ata_driver_load:
-  mov disk_addr, %edi 
-  mov disk_img_size, %eax
+  mov load_addr, %edi 
+  mov size, %eax
   test %eax, %eax
   jz _ret
 
@@ -26,7 +26,7 @@ _ata_driver_load:
   mov %eax, %ebx
   push %ebx 
 
-  movl disk_lba, %ecx
+  movl lba, %ecx
   // init 
 
   mov $0x1F2, %dx
@@ -52,7 +52,7 @@ _ata_driver_load:
   movb disk_number, %al
   shl $4, %al 
   or $0xE0, %al
-  mov disk_lba, %ecx 
+  mov lba, %ecx 
   shr $24, %ecx 
   and $0x0F, %cl 
   or %cl, %al
@@ -87,22 +87,22 @@ _sleep:
 
 _update_values:
   pop %ebx
-  mov disk_img_size, %eax 
+  mov size, %eax 
   sub %ebx, %eax
-  mov %eax, disk_img_size
-  mov disk_lba, %eax 
+  mov %eax, size
+  mov lba, %eax 
   add %ebx, %eax
-  mov %eax, disk_lba
-  mov %edi, disk_addr 
+  mov %eax, lba
+  mov %edi, load_addr 
   jmp _ata_driver_load
 
 _ret:
   pop %ebp
   ret
 
-disk_img_size: .long 0x0 
-disk_lba: .long 0x0
-disk_addr: .long 0x0 
+size: .long 0x0 
+lba: .long 0x0
+load_addr: .long 0x0 
 disk_number: .long 0x0
 
 .org 512

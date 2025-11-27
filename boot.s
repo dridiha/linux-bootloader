@@ -45,7 +45,7 @@ _load_setup_sectors:
    int $0x13
 
 _init_kernel_header:
-  movb $0xFF, %es:0x210
+  movb $0x1, %es:0x210
   // heap 
   orb $0x80, %es:0x211
   // heap end_ptr
