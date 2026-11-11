@@ -2,59 +2,59 @@
 
 _ata_driver_init:
   push %ebp
-  mov %esp, %ebp 
-  mov 8(%ebp), %eax 
+  mov %esp, %ebp
+  mov 8(%ebp), %eax
   mov %eax, load_addr
-  mov 12(%ebp), %eax 
+  mov 12(%ebp), %eax
   mov %eax, lba
-  mov 16(%ebp), %eax 
+  mov 16(%ebp), %eax
   mov %eax, size
-  mov 20(%ebp), %eax 
+  mov 20(%ebp), %eax
   mov %eax, disk_number
 
 _ata_driver_load:
-  mov load_addr, %edi 
+  mov load_addr, %edi
   mov size, %eax
   test %eax, %eax
   jz _ret
 
-  cmpl $0xFF, %eax 
-  jbe 1f 
+  cmpl $0xFF, %eax
+  jbe 1f
   mov $0xFF, %eax
 
 1:
   mov %eax, %ebx
-  push %ebx 
+  push %ebx
 
   movl lba, %ecx
-  // init 
+  // init
 
   mov $0x1F2, %dx
   mov %bl, %al
-  out %al, %dx 
+  out %al, %dx
 
   mov $0x1F3, %dx
   mov %cl, %al
-  out %al, %dx 
-  shr $8, %ecx 
+  out %al, %dx
+  shr $8, %ecx
 
   mov $0x1F4, %dx
   mov %cl, %al
-  out %al, %dx 
-  shr $8, %ecx 
+  out %al, %dx
+  shr $8, %ecx
 
   mov $0x1F5, %dx
   mov %cl, %al
-  out %al, %dx 
+  out %al, %dx
 
-  
+
   mov $0x1F6, %dx
   movb disk_number, %al
-  shl $4, %al 
+  shl $4, %al
   or $0xE0, %al
-  mov lba, %ecx 
-  shr $24, %ecx 
-  and $0x0F, %cl 
+  mov lba, %ecx
+  shr $24, %ecx
+  and $0x0F, %cl
   or %cl, %al
   out %al, %dx
   // send read command
@@ -71,12 +71,13 @@ _wait_loop:
   jmp _read
 
 _read:
+  cld
   mov $256, %cx
   mov $0x1F0, %dx
   rep insw
 
 _sleep:
-  mov $0x3F6, %dx 
+  mov $0x3F6, %dx
   in %dx, %al
   in %dx, %al
   in %dx, %al
@@ -87,22 +88,22 @@ _sleep:
 
 _update_values:
   pop %ebx
-  mov size, %eax 
+  mov size, %eax
   sub %ebx, %eax
   mov %eax, size
-  mov lba, %eax 
+  mov lba, %eax
   add %ebx, %eax
   mov %eax, lba
-  mov %edi, load_addr 
+  mov %edi, load_addr
   jmp _ata_driver_load
 
 _ret:
   pop %ebp
   ret
 
-size: .long 0x0 
+size: .long 0x0
 lba: .long 0x0
-load_addr: .long 0x0 
+load_addr: .long 0x0
 disk_number: .long 0x0
 
 .org 512
